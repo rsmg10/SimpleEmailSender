@@ -6,7 +6,6 @@ namespace EmailSender.Library.Models
     public interface IEmailSender
     {
         public bool SendEmail(Email Email);
-        //public bool SendEmailWithAttachment(EmailWithAttachments Email);
     }
 
     public class EmailSenderOptions
@@ -15,7 +14,7 @@ namespace EmailSender.Library.Models
         public string Email { get; set; }
         public string AppPassword { get; set; }
         public int Port { get; set; }
-        public List<string> AllowedContentType { get; set; }
+        public string AllowedContentType { get; set; } // comma-seperated content types
     }
     public class EmailVm
     {
@@ -35,9 +34,12 @@ namespace EmailSender.Library.Models
                 From = From,
                 To = To,
                 Cc = Cc,
+                Attachements = new List<EmailAttachment>()
             };
-            if (files.Any()) email.Attachements = files.ToList();
+            if (files.Any()) files.ForEach(f=> email.Attachements.Add(new EmailAttachment(f.FileName, f.OpenReadStream(), f.ContentType)));
+
             return email;
+
 
         }
     }
@@ -51,8 +53,8 @@ namespace EmailSender.Library.Models
         public string Content { get; set; }
         public bool HasAttachments { get; set; } = false;
 
-        private List<IFormFile> _attachements;
-        public List<IFormFile> Attachements
+        private List<EmailAttachment> _attachements;
+        public List<EmailAttachment> Attachements
         {
             get => _attachements;
             set
@@ -62,5 +64,7 @@ namespace EmailSender.Library.Models
             }
         }
     }
+    public record EmailAttachment (string Name, Stream File, string ContentType);
+
     public record EmailPaticipant(string Name, string Email);
 }

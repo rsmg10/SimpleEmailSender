@@ -82,7 +82,7 @@ namespace EmailSender.Library.Services
         {
             email.Attachements.ForEach(x =>
             {
-                message.Attachments.Add(new Attachment(x.OpenReadStream(), x.FileName));
+                message.Attachments.Add(new Attachment(x.File, x.Name));
             });
         }
 

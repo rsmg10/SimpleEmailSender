@@ -17,22 +17,6 @@ namespace EmailSender.Library.Services
         public EmailSender_MailKit(EmailSenderOptions options) => _options = options;
         public EmailSender_MailKit(IOptions<EmailSenderOptions> options) => _options = options.Value;
 
-        //public bool SendEmail(Email Email)
-        //{
-        //    try
-        //    {
-        //        //Environment.SetEnvironmentVariable("mypass", "ewfahttqlsqectrv");
-        //        //var pass = Environment.GetEnvironmentVariable("mypass");
-        //        var message = GetMessage(Email);
-        //        Send(message);
-        //        return true;
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        return false;
-        //    }
-        //}
-
         public bool SendEmail(Email Email)
         {
             try
@@ -43,17 +27,18 @@ namespace EmailSender.Library.Services
                 Multipart body = new Multipart(Email.HasAttachments ? "mixed" : "plain") { message.Body };
                 if (Email.HasAttachments)
                 {
-                    if (Email.Attachements.Any(file => !_options.AllowedContentType.Contains(file.ContentType))) return false;
-                    var attachments = Email.Attachements.Select(a => a.OpenReadStream()).ToList();
+                    if (Email.Attachements.Any(file => !_options.AllowedContentType.Split(',').Select(x=> x.Trim().Trim('"')).Contains(file.ContentType))) return false;
+
+                    var attachments = Email.Attachements.ToList();
                     var i = 0;
                     attachments.ForEach(a =>
                     {
                         attachment = new MimePart
                         {
-                            Content = new MimeContent(a),
+                            Content = new MimeContent(a.File),
                             ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
                             ContentTransferEncoding = ContentEncoding.Base64,
-                            FileName = Email.Attachements[i].FileName,
+                            FileName = a.Name,
                             IsAttachment = Email.HasAttachments
                         };
                         i++;
@@ -68,6 +53,7 @@ namespace EmailSender.Library.Services
             }
             catch (Exception e)
             {
+                Console.WriteLine(e);
                 return false;
                 throw;
             }

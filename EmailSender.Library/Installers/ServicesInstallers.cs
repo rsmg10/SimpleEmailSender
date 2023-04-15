@@ -27,9 +27,24 @@ namespace EmailSender.Library.Installers
             {
 
                 var config = scope.GetRequiredService<IConfiguration>();
-                var options = config.GetRequiredSection("EmailSenderOptions");
-                if (!options.Exists()) return services;
-                services.Configure<EmailSenderOptions>(options);
+                var options = config.GetSection("EmailSenderOptions");
+                var sendingEmail = options.Get<EmailSenderOptions>();
+
+                var test = Environment.GetEnvironmentVariable("Port");
+                Console.WriteLine(test);
+
+
+                if (!options.Exists())
+                    services.Configure<EmailSenderOptions>(o =>
+                       {
+                           o.Email = Environment.GetEnvironmentVariable("Email");
+                           o.AppPassword = Environment.GetEnvironmentVariable("AppPassword");
+                           o.Port = int.Parse(Environment.GetEnvironmentVariable("Port").Replace('"',' ') ?? "0") ;
+                           o.EmailDomain = Environment.GetEnvironmentVariable("EmailDomain");
+                           o.AllowedContentType = Environment.GetEnvironmentVariable("AllowedContentType");
+                       });
+                else
+                    services.Configure<EmailSenderOptions>(options);
             };
 
             return services;

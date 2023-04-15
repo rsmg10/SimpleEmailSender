@@ -28,9 +28,8 @@ namespace EmailSender.Controllers
                 email = JsonSerializer.Deserialize<EmailVm>(content);
             }
             else if (email is null) throw new Exception("no body available");
+
             return Ok(_emailSender.SendEmail(email.ToEmail(files)));
         }
     }
-
-}
 }
