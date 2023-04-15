@@ -45,7 +45,6 @@ namespace EmailSender.Library.Installers
                        });
                 else
                     services.Configure<EmailSenderOptions>(options);
-            };
 
             return services;
         }

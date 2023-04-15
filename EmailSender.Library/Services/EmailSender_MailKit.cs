@@ -27,7 +27,7 @@ namespace EmailSender.Library.Services
                 Multipart body = new Multipart(Email.HasAttachments ? "mixed" : "plain") { message.Body };
                 if (Email.HasAttachments)
                 {
-                    if (Email.Attachements.Any(file => !_options.AllowedContentType.Split(',').Select(x=> x.Trim().Trim('"')).Contains(file.ContentType))) return false;
+                    if (Email.Attachements.Any(file => !_options.AllowedContentType.Split(',').Select(x=> x.Trim()).Contains(file.ContentType))) return false;
 
                     var attachments = Email.Attachements.ToList();
                     var i = 0;
