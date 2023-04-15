@@ -19,24 +19,18 @@ namespace EmailSender.Controllers
         [HttpPost]
         public async Task<IActionResult> SendEmail(EmailVm? email)
         {
-            try
+            var files = new List<IFormFile>();
+            if (Request.ContentType != "application/json")
             {
-                var files = new List<IFormFile>();
-                if (Request.ContentType != "application/json")
-                {
-                    var forms = await Request.ReadFormAsync();
-                    files = forms.Files.ToList();
-                    var content = forms.FirstOrDefault(k => k.Key == "email").Value;
-                    email = JsonSerializer.Deserialize<EmailVm>(content);
-                }else if (email is null) throw new Exception("no body available");
-                return Ok(_emailSender.SendEmail(email.ToEmail(files)));
+                var forms = await Request.ReadFormAsync();
+                files = forms.Files.ToList();
+                var content = forms.FirstOrDefault(k => k.Key == "email").Value;
+                email = JsonSerializer.Deserialize<EmailVm>(content);
             }
-            catch (Exception e)
-            {
-
-                throw;
-            }
+            else if (email is null) throw new Exception("no body available");
+            return Ok(_emailSender.SendEmail(email.ToEmail(files)));
         }
-
     }
+
+}
 }
